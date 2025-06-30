@@ -1,0 +1,19 @@
+<div class="mt-4 flex items-center space-x-4">
+
+  <div>
+    <% if user_signed_in? && post.likes.exists?(user_id: current_user.id) %>
+      <%= button_to "Unlike", post_like_path(post), method: :delete, class: "bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold" %>
+    <% elsif user_signed_in? %>
+      <%= button_to "Like", post_like_path(post), method: :post, class: "bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold" %>
+    <% else %>
+      <span class="bg-gray-200 text-gray-500 px-3 py-1 rounded-full text-sm font-semibold">Like</span>
+    <% end %>
+  </div>
+
+  <div class="text-gray-600 text-sm">
+    <%# This now runs a live database query every time it's displayed %>
+    <span><%= post.likes.count %></span>
+    <span><%= 'Like'.pluralize(post.likes.count) %></span>
+  </div>
+
+</div>

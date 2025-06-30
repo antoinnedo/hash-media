@@ -13,7 +13,7 @@
           <%= link_to post.title, post, class: "hover:text-blue-600" %>
         </h2>
         <p class="text-gray-600 text-sm mb-4">
-          By <%= post.user.email %> on <%= post.created_at.strftime("%B %d, %Y") %>
+          By <%= link_to post.user.username, user_path(post.user) %> on <%= post.created_at.strftime("%B %d, %Y") %>
         </p>
         <div class="prose max-w-none mb-4">
           <%= truncate(post.content, length: 200) %>
@@ -27,7 +27,9 @@
           </div>
         <% end %>
 
-
+        <%# app/views/posts/index.html.erb %>
+        <%= render 'likes/like_section', post: post %>
+      </div>
     <% end %>
   </div>
 </div>
