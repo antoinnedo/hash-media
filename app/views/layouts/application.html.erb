@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Hash Media" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-100 text-gray-900">
+    <header class="bg-white shadow-md">
+      <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <%= link_to "Hash Media", root_path, class: "text-xl font-bold text-indigo-600" %>
+
+        <ul class="flex items-center space-x-4">
+          <% if user_signed_in? %>
+            <li><%= link_to "New Post", new_post_path, class: "bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-2 px-3 rounded" %></li>
+            <li><%= link_to "My Profile", user_path(current_user), class: "text-gray-600 hover:text-indigo-600" %></li>
+            <li><%= link_to "Edit Account", edit_user_registration_path, class: "text-gray-600 hover:text-indigo-600" %></li>
+            <li><%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "text-gray-600 hover:text-indigo-600" %></li>
+          <% else %>
+            <li><%= link_to "Sign Up", new_user_registration_path, class: "text-gray-600 hover:text-indigo-600" %></li>
+            <li><%= link_to "Sign In", new_user_session_path, class: "text-gray-600 hover:text-indigo-600" %></li>
+          <% end %>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+      <%# --- A better way to render flash messages --- %>
+      <% if flash.present? %>
+        <div class="mb-4">
+          <% flash.each do |key, value| %>
+            <% color = key.to_s == "notice" ? "blue" : "red" %>
+            <div class="bg-<%= color %>-100 border border-<%= color %>-400 text-<%= color %>-700 px-4 py-3 rounded relative" role="alert">
+              <%= value %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+  </body>
+</html>

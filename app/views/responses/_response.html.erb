@@ -1,0 +1,15 @@
+<%# This partial is rendered for each response %>
+<div class="ml-12 mt-3 p-3 bg-gray-100 rounded-md border border-gray-200" id="response-<%= response.id %>">
+  <p class="text-gray-600 text-xs">
+    <strong><%= link_to response.user.username, user_path(response.user), class: "hover:underline" %></strong> replied:
+  </p>
+  <div class="prose prose-xs max-w-none mt-1">
+    <%= response.content %>
+  </div>
+
+  <% if user_signed_in? && response.user == current_user %>
+    <div class="text-xs mt-1">
+      <%= button_to 'Delete',  [response.comment, response], method: :delete, data: { confirm: 'Are you sure?' }, class: "text-red-500 hover:underline" %>
+    </div>
+  <% end %>
+</div>

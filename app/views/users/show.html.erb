@@ -1,0 +1,85 @@
+<div class="max-w-4xl mx-auto px-4">
+
+  <%# --- Profile Header Card --- %>
+  <div class="bg-white p-8 rounded-lg shadow-md mb-10">
+    <div class="flex flex-col md:flex-row justify-between items-start">
+      <div>
+        <h1 class="text-4xl font-bold text-gray-800"><%= @user.username %></h1>
+
+        <%# --- Follower/Following Counts --- %>
+        <div class="flex space-x-6 mt-2 text-gray-600">
+          <div>
+            <strong class="text-xl font-bold text-gray-900"><%= @user.followers.count %></strong> Followers
+          </div>
+          <div>
+            <strong class="text-xl font-bold text-gray-900"><%= @user.following.count %></strong> Following
+          </div>
+        </div>
+      </div>
+
+      <%# --- Follow/Unfollow Button --- %>
+      <div class="mt-4 md:mt-0">
+        <% if user_signed_in? && current_user != @user %>
+          <% if current_user.following?(@user) %>
+            <%= form_with(model: current_user.active_relationships.find_by(followed_id: @user.id), method: :delete) do |form| %>
+              <%= form.submit "Unfollow", class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg cursor-pointer" %>
+            <% end %>
+          <% else %>
+            <%= form_with(model: current_user.active_relationships.build) do |form| %>
+              <%= form.hidden_field :followed_id, value: @user.id %>
+              <%= form.submit "Follow", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg cursor-pointer" %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+
+  <%# --- Activity Feed Section --- %>
+  <h2 class="text-3xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+
+  <div class="space-y-4">
+    <% if @activities.empty? %>
+      <div class="bg-white p-6 rounded-lg shadow-sm text-center text-gray-500">
+        <p><%= @user.username %> has no recent activity.</p>
+      </div>
+    <% else %>
+      <% @activities.each do |activity| %>
+        <div class="bg-white p-5 rounded-lg shadow-sm">
+          <p class="text-sm text-gray-500 mb-2"><%= time_ago_in_words(activity.created_at) %> ago</p>
+
+          <%# We use a 'case' statement to handle each activity type differently %>
+          <% case activity.class.name %>
+          <% when "Post" %>
+            Created a new post:
+            <h3 class="text-xl font-semibold mt-1">
+              <%= link_to activity.title, post_path(activity), class: "text-gray-900 hover:text-indigo-700" %>
+            </h3>
+            <div class="text-gray-600 prose prose-sm max-w-none mt-2">
+              <%= truncate(activity.content, length: 150) %>
+            </div>
+
+          <% when "Comment" %>
+            <p class="text-gray-800">
+              Commented on the post:
+              <strong><%= link_to activity.post.title, post_path(activity.post, anchor: "comment-#{activity.id}"), class: "font-semibold text-indigo-600 hover:underline" %></strong>
+            </p>
+            <blockquote class="mt-2 pl-4 border-l-4 border-gray-200 text-gray-600 italic">
+              <%= activity.content %>
+            </blockquote>
+
+          <% when "Response" %>
+            <p class="text-gray-800">
+              Responsed to a comment on the post:
+              <strong><%= link_to activity.comment.post.title, post_path(activity.comment.post, anchor: "response-#{activity.id}"), class: "font-semibold text-indigo-600 hover:underline" %></strong>
+            </p>
+            <blockquote class="mt-2 pl-4 border-l-4 border-gray-200 text-gray-600 italic">
+              <%= activity.content %>
+            </blockquote>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
