@@ -1,85 +1,155 @@
-<div class="max-w-4xl mx-auto px-4">
+<%# The main container for the profile page, with a light gray background provided by the body tag if you add the style from the HTML preview. %>
+<div class="max-w-4xl mx-auto px-4 py-10">
 
   <%# --- Profile Header Card --- %>
-  <div class="bg-white p-8 rounded-lg shadow-md mb-10">
-    <div class="flex flex-col md:flex-row justify-between items-start">
-      <div>
-        <h1 class="text-4xl font-bold text-gray-800"><%= @user.username %></h1>
+  <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mb-10">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-6">
 
-        <%# --- Follower/Following Counts --- %>
-        <div class="flex space-x-6 mt-2 text-gray-600">
-          <div>
-            <strong class="text-xl font-bold text-gray-900"><%= @user.followers.count %></strong> Followers
-          </div>
-          <div>
-            <strong class="text-xl font-bold text-gray-900"><%= @user.following.count %></strong> Following
-          </div>
+      <%# Left side: Avatar and User Info %>
+      <div class="flex items-center gap-5">
+        <% if current_user == @user %>
+          <%#
+            This form is specifically for updating the user model.
+            `multipart: true` is essential for file uploads.
+            The form is submitted automatically by the JavaScript below.
+          %>
+          <%= form_with(model: @user, html: { id: "avatar-form", multipart: true, class: "relative w-24 h-24" }) do |form| %>
+
+            <%# Your existing logic to display the current avatar or a default %>
+            <% if @user.avatar.attached? %>
+              <%= image_tag @user.avatar.variant(resize_to_limit: [100, 100]), class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+            <% else %>
+              <%= image_tag 'default_avatar.png', class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+            <% end %>
+
+            <%# This is the "button". It's a styled label that triggers the hidden file input. %>
+            <%= form.label :avatar, class: "absolute -bottom-1 -right-1 bg-gray-800 hover:bg-gray-900 text-white p-2 rounded-full shadow-md cursor-pointer transition" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            <% end %>
+
+            <%# This is the actual file input, visually hidden but triggered by the label. %>
+            <%= form.file_field :avatar, class: "hidden", id: "avatar-input" %>
+          <% end %>
+
+        <% else %>
+          <%# For other users, just display their avatar without any upload functionality. %>
+          <% if @user.avatar.attached? %>
+            <%= image_tag @user.avatar.variant(resize_to_limit: [100, 100]), class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+          <% else %>
+            <%= image_tag 'default_avatar.png', class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+          <% end %>
+        <% end %>
+
+        <div>
+          <%# Username %>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900"><%= @user.username %></h1>
+
+          <%# Follower/Following Counts %>
+          <span class="mr-4">
+            <%= link_to users_path(list: 'followers', username: @user.username), class: "hover:text-indigo-600" do %>
+              <strong><%= @user.followers.count %></strong> Followers
+            <% end %>
+          </span>
+          <span>
+            <%= link_to users_path(list: 'following', username: @user.username), class: "hover:text-indigo-600" do %>
+              <strong><%= @user.following.count %></strong> Following
+            <% end %>
+          </span>
         </div>
       </div>
 
-      <%# --- Follow/Unfollow Button --- %>
-      <div class="mt-4 md:mt-0">
-        <% if user_signed_in? && current_user != @user %>
-          <% if current_user.following?(@user) %>
-            <%= form_with(model: current_user.active_relationships.find_by(followed_id: @user.id), method: :delete) do |form| %>
-              <%= form.submit "Unfollow", class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg cursor-pointer" %>
-            <% end %>
-          <% else %>
-            <%= form_with(model: current_user.active_relationships.build) do |form| %>
-              <%= form.hidden_field :followed_id, value: @user.id %>
-              <%= form.submit "Follow", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg cursor-pointer" %>
-            <% end %>
-          <% end %>
-        <% end %>
-      </div>
+      <%# Right side: Follow/Unfollow Button Logic %>
+      <%= render "users/follow_section", user: @user %>
+      <%#if  current_user == @user %>
+        <%#= link_to "Edit Profile", edit_user_path(@user), class: "btn w-15 sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg cursor-pointer shadow-sm hover:shadow-md transform hover:-translate-y-0.5" %>
+      <%# end %>
     </div>
   </div>
 
 
   <%# --- Activity Feed Section --- %>
-  <h2 class="text-3xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+  <h2 class="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h2>
 
-  <div class="space-y-4">
+  <div class="space-y-6">
+    <%# Check if there are any activities to display %>
     <% if @activities.empty? %>
-      <div class="bg-white p-6 rounded-lg shadow-sm text-center text-gray-500">
-        <p><%= @user.username %> has no recent activity.</p>
+      <div class="bg-white p-8 rounded-lg shadow-sm text-center text-gray-500 border-2 border-dashed">
+        <p class="font-medium"><%= @user.username %> has no recent activity.</p>
       </div>
     <% else %>
+      <%# Loop through each activity and render the appropriate card %>
       <% @activities.each do |activity| %>
-        <div class="bg-white p-5 rounded-lg shadow-sm">
-          <p class="text-sm text-gray-500 mb-2"><%= time_ago_in_words(activity.created_at) %> ago</p>
-
-          <%# We use a 'case' statement to handle each activity type differently %>
-          <% case activity.class.name %>
-          <% when "Post" %>
-            Created a new post:
-            <h3 class="text-xl font-semibold mt-1">
-              <%= link_to activity.title, post_path(activity), class: "text-gray-900 hover:text-indigo-700" %>
-            </h3>
-            <div class="text-gray-600 prose prose-sm max-w-none mt-2">
-              <%= truncate(activity.content, length: 150) %>
+        <% case activity.class.name %>
+        <% when "Post" %>
+          <div class="bg-white p-5 rounded-xl shadow-lg flex gap-4 items-start">
+            <div class="flex-shrink-0 bg-blue-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             </div>
+            <div class="flex-grow">
+              <p class="text-sm text-gray-500 mb-1"><%= time_ago_in_words(activity.created_at) %> ago</p>
+              <p class="text-gray-800 mb-2">
+                Created a new post:
+                <%= link_to activity.title, post_path(activity), class: "text-lg font-semibold text-gray-900 hover:text-blue-700" %>
+              </p>
+              <div class="text-gray-600 text-sm">
+                <%= truncate(activity.content, length: 150) %>
+              </div>
+            </div>
+          </div>
 
-          <% when "Comment" %>
-            <p class="text-gray-800">
-              Commented on the post:
-              <strong><%= link_to activity.post.title, post_path(activity.post, anchor: "comment-#{activity.id}"), class: "font-semibold text-indigo-600 hover:underline" %></strong>
-            </p>
-            <blockquote class="mt-2 pl-4 border-l-4 border-gray-200 text-gray-600 italic">
-              <%= activity.content %>
-            </blockquote>
+        <% when "Comment" %>
+          <div class="bg-white p-5 rounded-xl shadow-lg flex gap-4 items-start">
+            <div class="flex-shrink-0 bg-green-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            </div>
+            <div class="flex-grow">
+              <p class="text-sm text-gray-500 mb-1"><%= time_ago_in_words(activity.created_at) %> ago</p>
+              <p class="text-gray-800">
+                Commented on the post:
+                <%= link_to activity.post.title, post_path(activity.post, anchor: "comment-#{activity.id}"), class: "font-semibold text-blue-600 hover:underline" %>
+              </p>
+              <blockquote class="mt-2 p-3 bg-gray-50 rounded-lg border-l-4 border-gray-200 text-gray-700 italic">
+                "<%= activity.content %>"
+              </blockquote>
+            </div>
+          </div>
 
-          <% when "Response" %>
-            <p class="text-gray-800">
-              Responsed to a comment on the post:
-              <strong><%= link_to activity.comment.post.title, post_path(activity.comment.post, anchor: "response-#{activity.id}"), class: "font-semibold text-indigo-600 hover:underline" %></strong>
-            </p>
-            <blockquote class="mt-2 pl-4 border-l-4 border-gray-200 text-gray-600 italic">
-              <%= activity.content %>
-            </blockquote>
-          <% end %>
-        </div>
+        <% when "Response" %>
+          <div class="bg-white p-5 rounded-xl shadow-lg flex gap-4 items-start">
+            <div class="flex-shrink-0 bg-purple-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6-6m-6 6l6 6"></path></svg>
+            </div>
+            <div class="flex-grow">
+              <p class="text-sm text-gray-500 mb-1"><%= time_ago_in_words(activity.created_at) %> ago</p>
+              <p class="text-gray-800">
+                Replied to a comment on:
+                <%= link_to activity.comment.post.title, post_path(activity.comment.post, anchor: "response-#{activity.id}"), class: "font-semibold text-blue-600 hover:underline" %>
+              </p>
+              <blockquote class="mt-2 p-3 bg-gray-50 rounded-lg border-l-4 border-gray-200 text-gray-700 italic">
+                <%= activity.content %>
+              </blockquote>
+            </div>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
   </div>
 </div>
+
+<script>
+  document.addEventListener('turbo:load', function() {
+    const avatarInput = document.getElementById('avatar-input');
+    const avatarForm = document.getElementById('avatar-form');
+
+    if (avatarInput && avatarForm) {
+      avatarInput.addEventListener('change', function() {
+        // When a file is chosen, this automatically submits the form.
+        // `requestSubmit()` correctly sends a PATCH/POST, not a GET.
+        avatarForm.requestSubmit();
+      });
+    }
+  });
+</script>

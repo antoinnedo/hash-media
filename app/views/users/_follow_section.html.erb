@@ -1,0 +1,16 @@
+<% if current_user != user %>
+  <div class="mt-4 sm:mt-0 w-full sm:w-auto">
+    <% if current_user.following?(user) %>
+      <%# The "data: { turbo: false }" part is the key. It forces a full page reload. %>
+      <%= form_with(model: current_user.active_relationships.find_by(followed_id: user.id), method: :delete, data: { turbo: false }) do |form| %>
+        <%= form.submit "Unfollow", class: "btn w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg cursor-pointer shadow-sm hover:shadow-md transform hover:-translate-y-0.5" %>
+      <% end %>
+    <% else %>
+      <%# We add the same data attribute here. %>
+      <%= form_with(url: relationships_path, data: { turbo: false }) do |form| %>
+        <%= form.hidden_field :followed_id, value: user.id %>
+        <%= form.submit "Follow", class: "btn w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg cursor-pointer shadow-sm hover:shadow-md transform hover:-translate-y-0.5" %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

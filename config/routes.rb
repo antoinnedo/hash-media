@@ -2,10 +2,11 @@ Rails.application.routes.draw do
   get "home/index"
   devise_for :users
   root to: "posts#index"
-  resources :users, only: [:index, :show]
+  resources :users, only: [:index, :show, :edit, :update]
 
   resources :posts do
     resources :comments, only: [:create, :update, :destroy]
+    resource :like, only: [:create, :destroy]
   end
 
   resources :comments do
@@ -14,7 +15,4 @@ Rails.application.routes.draw do
 
   resources :relationships, only: [:create, :destroy]
 
-  resources :posts do
-    resource :like, only: [:create, :destroy]
-  end
 end

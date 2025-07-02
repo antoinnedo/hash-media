@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :responses, dependent: :destroy
 
+  has_one_attached :avatar
+
   before_create :skip_confirmation_in_development
 
   # Relationships where this user is the one doing the following
@@ -58,5 +60,10 @@ class User < ApplicationRecord
 
   def skip_confirmation_in_development
     self.confirmed_at = Time.current if Rails.env.development?
+  end
+
+  def user_params
+    # This tells Rails to allow the :avatar attribute to be saved
+    params.require(:user).permit(:avatar)
   end
 end

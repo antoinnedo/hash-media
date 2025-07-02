@@ -1,0 +1,44 @@
+<%# app/views/users/index.html.erb %>
+
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+  <%# This title is dynamic, set by the controller. %>
+  <h1 class="text-3xl font-bold mb-6 text-gray-800"><%= @title %></h1>
+
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <ul class="divide-y divide-gray-200">
+      <% if @users.any? %>
+        <% @users.each do |user| %>
+          <%# We don't show the current user in the list, e.g., in their own "following" list. %>
+          <% unless user == current_user %>
+            <li class="p-4 flex items-center justify-between hover:bg-gray-50 transition">
+
+              <%# User Info Section %>
+              <div class="flex items-center">
+                <%= link_to user_path(user) do %>
+                  <% if user.avatar.attached? %>
+                    <%= image_tag user.avatar.variant(resize_to_limit: [50, 50]), class: "w-12 h-12 rounded-full object-cover" %>
+                  <% else %>
+                    <%= image_tag 'default_avatar.png', class: "w-12 h-12 rounded-full object-cover" %>
+                  <% end %>
+                <% end %>
+
+                <%# UPDATED: Removed the first_name and last_name line. %>
+                <div class="ml-4">
+                  <%= link_to user.username, user_path(user), class: "text-lg font-semibold text-gray-900 hover:text-indigo-600" %>
+                </div>
+              </div>
+
+              <%# Action Button Section - Renders the follow/unfollow button %>
+              <div class="ml-4">
+                <%= render 'users/follow_section', user: user %>
+              </div>
+
+            </li>
+          <% end %>
+        <% end %>
+      <% else %>
+        <p class="p-4 text-gray-500">This list is empty.</p>
+      <% end %>
+    </ul>
+  </div>
+</div>

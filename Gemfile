@@ -1,5 +1,7 @@
 source "https://rubygems.org"
 
+gem 'ruby-vips'
+gem "image_processing"
 gem 'omniauth'
 gem 'devise'
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
@@ -56,6 +58,8 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem 'letter_opener_web'
+  gem 'dotenv-rails'
 end
 
 group :test do
