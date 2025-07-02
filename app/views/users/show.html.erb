@@ -125,7 +125,7 @@
             <div class="flex-grow">
               <p class="text-sm text-gray-500 mb-1"><%= time_ago_in_words(activity.created_at) %> ago</p>
               <p class="text-gray-800">
-                Replied to a comment on
+                Replied to a comment on:
                 <%= link_to activity.comment.post.title, post_path(activity.comment.post, anchor: "response-#{activity.id}"), class: "font-semibold text-blue-600 hover:underline" %>
               </p>
               <blockquote class="mt-2 p-3 bg-gray-50 rounded-lg border-l-4 border-gray-200 text-gray-700 italic">
