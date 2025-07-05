@@ -1,5 +1,11 @@
 <%# This partial is rendered for each response %>
 <div class="ml-12 mt-3 p-3 bg-gray-100 rounded-md border border-gray-200" id="response-<%= response.id %>">
+  <%# Your existing logic to display the current avatar or a default %>
+  <% if @post.user.avatar.attached? %>
+    <%= image_tag @post.user.avatar.variant(resize_to_limit: [100, 100]), class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+  <% else %>
+    <%= image_tag 'default_avatar.png', class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+  <% end %>
   <p class="text-gray-600 text-xs">
     <strong><%= link_to response.user.username, user_path(response.user), class: "hover:underline" %></strong> replied:
   </p>

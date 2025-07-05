@@ -1,32 +1,54 @@
 services:
-  db:
-    image: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: your_password
-    networks:
-      - rails_app
-
   web:
-    build: .
-    command: bundle exec rails s -p 3000 -b '0.0.0.0'
-    volumes:
-      - .:/app
-    ports:
-      - "3000:3000"
+    env_file: .env  # Shared env file (not ideal but works)
+    build: .  # Shortcut for context+dockerfile
+    ports: ["3000:3000"]  # Expose web port
     depends_on:
-      - db
-    environment:
-      - DATABASE_URL=postgres://postgres:your_password@db
-      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
-      - RAILS_ENV=production
+      db:
+        condition: service_healthy
+    environment:  # Overrides .env if needed
+      DATABASE_HOST: db
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      RAILS_ENV: production  # Force prod mode
+    volumes:  # Only persistent data
+      - bundle_cache:/usr/local/bundle  # Gem cache
+      - uploads:/app/uploads  # User files
+    deploy: {resources: {limits: {cpus: '1.0', memory: 1GB}}}  # Prevent memory leaks
+    restart: unless-stopped  # Auto-recover
     networks:
-      - rails_app
+      - backend_network  # Same network as DB
+      - default         # Keep existing if needed
 
-volumes:
-  postgres_data:
+  db:
+    image: postgres:16
+    env_file: .env  # Same shared file
+    environment:  # DB config
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:  # Critical DB files
+      - postgres_data:/var/lib/postgresql/data  # Main data
+      - ./backups:/backups  # NEW: Local backup folder
+    deploy: {resources: {limits: {cpus: '1.0', memory: 2GB}}}
+    restart: unless-stopped  # Must survive reboots
+    networks:
+      - backend_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:  # Named volumes (Docker-managed)
+  postgres_data:  # DB storage (DONT DELETE)
+  bundle_cache:  # Optional speed boost
+  uploads:  # User uploads
 
 networks:
-  rails_app:
-    driver: bridge
+  backend_network:
+    name: hash-media_backend_network
+
+# BACKUP COMMAND (run manually or via cron)
+# docker exec -t your-db-container pg_dump -U youruser -d yourdb > backups/dump_$(date +%Y-%m-%d).sql

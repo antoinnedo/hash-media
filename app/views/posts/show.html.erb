@@ -4,8 +4,13 @@
       <%= link_to '← Back to all posts', posts_path, class: "hover:underline" %>
     </p>
     <h1 class="text-4xl font-bold mb-2"><%= @post.title %></h1>
-    <div class="text-gray-600 text-sm mb-6 flex flex-grow justify-start content-center">
-      <%= image_tag 'default_avatar.png', class: 'rounded-full shadow-sm w-16 h-auto' %>
+    <div class="text-gray-600 text-sm mb-6 flex flex-grow justify-start content-center gap-2">
+      <%# Your existing logic to display the current avatar or a default %>
+      <% if @post.user.avatar.attached? %>
+        <%= image_tag @post.user.avatar.variant(resize_to_limit: [100, 100]), class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+      <% else %>
+        <%= image_tag 'default_avatar.png', class: "w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" %>
+      <% end %>
       <%= link_to @post.user.username, user_path(@post.user), class: "hover:underline text-center" %> posted on <%= @post.created_at.strftime("%B %d, %Y") %>
     </div>
 

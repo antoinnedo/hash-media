@@ -3,6 +3,9 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  config.action_cable.mount_path = nil
+  config.action_cable.disable_request_forgery_protection = true
+
   # Code is not reloaded between requests.
   config.enable_reloading = false
 
@@ -25,10 +28,10 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  config.assume_ssl = true
+  config.assume_ssl = false
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = false
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
@@ -89,12 +92,16 @@ Rails.application.configure do
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.default_url_options = { host: 'your_domain.com', protocol: 'https' }
+  config.action_mailer.default_url_options = {
+    host: 'localhost',
+    port: 3000,
+    protocol: 'http'
+  }
   config.action_mailer.smtp_settings = {
-    user_name:      ENV['SMTP_USERNAME'],
-    password:       ENV['SMTP_PASSWORD'],
-    address:        ENV['SMTP_ADDRESS'],
-    port:           ENV['SMTP_PORT'],
+    address:        'smtp.gmail.com',
+    port:           587,
+    user_name:      ENV['GMAIL_USERNAME'],
+    password:       ENV['GMAIL_APP_PASSWORD'],
     authentication: :plain,
     enable_starttls_auto: true
   }

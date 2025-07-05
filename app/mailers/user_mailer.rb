@@ -4,6 +4,6 @@ class UserMailer < ApplicationMailer
 
   def welcome_email(user)
     @user = user
-    mail(to: @user.email, subject: 'Welcome to HASH')
+    mail(to: @user.email, subject: 'Welcome to HASH! Your email has been confirmed')
   end
 end

@@ -1,3 +1,4 @@
+
 source "https://rubygems.org"
 
 gem 'ruby-vips'
@@ -53,13 +54,16 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "dotenv-rails"
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
+  gem 'listen'
+  gem 'spring'
   gem "web-console"
-  gem 'letter_opener_web'
-  gem 'dotenv-rails'
+  gem 'letter_opener'
 end
 
 group :test do
@@ -68,6 +72,6 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "tailwindcss-ruby", "~> 4.1"
+gem "tailwindcss-ruby"
 
-gem "tailwindcss-rails", "~> 4.2"
+gem "tailwindcss-rails"

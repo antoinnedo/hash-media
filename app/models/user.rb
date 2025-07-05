@@ -12,8 +12,6 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
 
-  before_create :skip_confirmation_in_development
-
   # Relationships where this user is the one doing the following
   has_many :active_relationships, class_name:  "Relationship",
                                   foreign_key: "follower_id",
