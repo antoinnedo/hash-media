@@ -25,4 +25,4 @@
 /.kamal
 /.devcontainer
 /.dockerignore
-/Dockerfile*
+Dockerfile

@@ -2,7 +2,8 @@ services:
   web:
     env_file: .env  # Shared env file (not ideal but works)
     build: .  # Shortcut for context+dockerfile
-    ports: ["3000:3000"]  # Expose web port
+    ports:
+      - "3000:3000"  # Expose web port
     depends_on:
       db:
         condition: service_healthy
@@ -14,8 +15,7 @@ services:
       RAILS_ENV: production  # Force prod mode
     volumes:  # Only persistent data
       - bundle_cache:/usr/local/bundle  # Gem cache
-      - uploads:/app/uploads  # User files
-    deploy: {resources: {limits: {cpus: '1.0', memory: 1GB}}}  # Prevent memory leaks
+      - uploads:/hash-media/uploads  # User files
     restart: unless-stopped  # Auto-recover
     networks:
       - backend_network  # Same network as DB
@@ -31,6 +31,8 @@ services:
     volumes:  # Critical DB files
       - postgres_data:/var/lib/postgresql/data  # Main data
       - ./backups:/backups  # NEW: Local backup folder
+    ports:
+      - "5433:5432"
     deploy: {resources: {limits: {cpus: '1.0', memory: 2GB}}}
     restart: unless-stopped  # Must survive reboots
     networks:
