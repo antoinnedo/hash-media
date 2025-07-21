@@ -40,7 +40,7 @@ group :development, :test do
   gem 'dotenv-rails', '~> 3.1.8'
   gem 'capybara', '~> 3.40.0'
   gem 'selenium-webdriver', '~> 4.34.0'
-  gem 'brakeman', '~> 7.0.2', require: false
+  gem 'brakeman', '~> 7.1.0', require: false
   gem 'rubocop-rails-omakase', '~> 1.1.0'
 end
 
