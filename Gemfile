@@ -14,7 +14,7 @@ gem 'devise', '~> 4.9.4'
 gem 'omniauth', '~> 2.1.3'
 
 # Frontend
-gem 'importmap-rails', '~> 2.1.0'
+gem 'importmap-rails', '~> 2.2.0'
 gem 'propshaft', '~> 1.1.0'
 gem 'stimulus-rails', '~> 1.3.4'
 gem 'tailwindcss-rails', '~> 4.2.3'
