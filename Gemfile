@@ -28,7 +28,7 @@ gem 'ruby-vips', '~> 2.2.4'
 gem 'kamal', '~> 2.7.0'
 gem 'thruster', '~> 0.1.14'
 gem 'bootsnap', '~> 1.18.6', require: false
-gem 'jbuilder', '~> 2.13.0'
+gem 'jbuilder', '~> 2.14.1'
 gem 'puma', '>= 5.0'
 
 # System dependencies
