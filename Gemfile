@@ -26,7 +26,7 @@ gem 'ruby-vips', '~> 2.2.4'
 
 # Production
 gem 'kamal', '~> 2.7.0'
-gem 'thruster', '~> 0.1.14'
+gem 'thruster', '~> 0.1.16'
 gem 'bootsnap', '~> 1.18.6', require: false
 gem 'jbuilder', '~> 2.13.0'
 gem 'puma', '>= 5.0'
